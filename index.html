@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta content="stuff, to, help, search, engines, not" name="keywords">
+    <meta content="What this page is about." name="description">
+    <meta content="Display Webcam Stream" name="title">
+    <title>Display Webcam Stream</title>
+
+    <style>
+        video,
+        canvas {
+            margin-left: 230px;
+            margin-top: 120px;
+            position: absolute;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+
+    <!-- allow import within electron (https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined)-->
+    <script>
+        if (typeof module === 'object') { window.module = module; module = undefined; }
+    </script>
+
+    <script src="bower_components/tracking/build/tracking-min.js"></script>
+    <script src="bower_components/tracking/build/data/face-min.js"></script>
+    <script src="bower_components/dat-gui/build/dat.gui.min.js"></script>
+
+    <script>
+        window.onload = function () {
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+
+            var tracker = new tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
+
+            tracking.track('#video', tracker, { camera: true });
+
+            tracker.on('track', function (event) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                event.data.forEach(function (rect) {
+                    context.strokeStyle = '#a64ceb';
+                    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                    context.font = '11px Helvetica';
+                    context.fillStyle = "#fff";
+                    context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                    context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+                });
+            });
+
+            var gui = new dat.GUI();
+            gui.add(tracker, 'edgesDensity', 0.1, 0.5).step(0.01);
+            gui.add(tracker, 'initialScale', 1.0, 10.0).step(0.1);
+            gui.add(tracker, 'stepSize', 1, 5).step(0.1);
+        };
+    </script>
+    </script>
+</head>
+
+<body>
+
+    <div class="demo-title">
+        <p><a href="http://trackingjs.com" target="_parent">tracking.js</a> － get user's webcam and detect faces</p>
+    </div>
+    <div class="demo-frame">
+        <div class="demo-container">
+            <video id="video" width="1000" height="1000" preload autoplay loop muted></video>
+            <canvas id="canvas" width="1000" height="1000"></canvas>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
