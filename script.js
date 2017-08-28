@@ -33,6 +33,26 @@ function start(){
     
 }
 
+//This function takes the total emotion present on an image
+//and find the dominant emotion across all the faces.
+function findDominantEmotion(totalEmotion){
+   var result=Object.keys(totalEmotion).reduce(function(a,b){return totalEmotion[a]>totalEmotion[b]?a:b});
+   document.getElementById('result').textContent= result;
+    //call robotAPI based on total emotion
+}
+
+//combine the emotions of the different faces in a picture.
+function sumObjectsByKey() {
+    return Array.from(arguments).reduce((a, b) => {
+      for (let k in b) {
+        if (b.hasOwnProperty(k))
+          a[k] = (a[k] || 0) + b[k];
+      }
+      return a;
+    }, {});
+  }
+  
+
 function clickevent(){
     var video = document.getElementById('video');
     var canvas = document.getElementById('canvas');
@@ -54,9 +74,20 @@ function clickevent(){
         
             context.font = '11px Helvetica';
             context.fillStyle = "#fff";
-            var faceRect= answer[0].faceRectangle;
-            
-            context.strokeRect(faceRect.left,faceRect.top,faceRect.height,faceRect.width);
+
+            answer.forEach(function(faces) {
+
+                //get the face rectangle to draw
+                var faceRect= faces.faceRectangle;             
+                context.strokeRect(faceRect.left,faceRect.top,faceRect.height,faceRect.width);
+
+                //get the emotions of all the persons present and put them in an array
+                var totalEmotion= sumObjectsByKey(faces.scores);
+
+                var dominant = findDominantEmotion(totalEmotion);
+            }, this);
+
+           
           
         }
     }
