@@ -11,6 +11,7 @@ function start(){
 
     tracking.track('#video', tracker, { camera: true });
 
+    
     tracker.on('track', function (event) {
        // context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -54,6 +55,7 @@ function sumObjectsByKey() {
   
   //function that evaluate emotion of each faces and draw it to the screen
   function drawFaces(canvas, context, faces){
+    context.clearRect(0, 0, canvas.width, canvas.height);
     var result = findDominantEmotion(faces.scores);
     alert (result);
             var color; 
