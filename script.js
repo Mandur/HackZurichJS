@@ -38,7 +38,7 @@ function start(){
 function findDominantEmotion(totalEmotion){
    var result=Object.keys(totalEmotion).reduce(function(a,b){return totalEmotion[a]>totalEmotion[b]?a:b});
    document.getElementById('result').textContent= result;
-    //call robotAPI based on total emotion
+   return result;
 }
 
 //combine the emotions of the different faces in a picture.
@@ -52,6 +52,46 @@ function sumObjectsByKey() {
     }, {});
   }
   
+  //function that evaluate emotion of each faces and draw it to the screen
+  function drawFaces(canvas, context, faces){
+    var result = findDominantEmotion(faces.scores);
+    alert (result);
+            var color; 
+            switch (result) {
+                case 'anger':
+                    color = "#FF0000";
+                    break;
+                case 'neutral':
+                    color = "#AFEEEE";
+                    break;
+                case 'contempt':
+                    color = "#4169E1";
+                    break;
+                case 'disgust':
+                    color = "#EE82EE";
+                    break;
+                case 'fear':
+                    color = "#FFFF00";
+                    break;
+                case 'happiness':
+                    color = "#7FFF00";
+                    break;
+                case 'sadness':
+                    color = "#006400";
+                    break;
+                case 'surprise':
+                    color = "#9932CC";
+                    break;
+        
+            }
+             //get the face rectangle to draw
+             var faceRect= faces.faceRectangle;  
+          
+             context.strokeStyle = color;
+             context.strokeRect(faceRect.left,faceRect.top,faceRect.height,faceRect.width);
+ 
+
+  }
 
 function clickevent(){
     var video = document.getElementById('video');
@@ -70,21 +110,19 @@ function clickevent(){
     request.onreadystatechange = function() {
         if (request.readyState == XMLHttpRequest.DONE) {
             var answer=JSON.parse(request.responseText);
-            context.strokeStyle = '#a64ceb';
-        
+         
             context.font = '11px Helvetica';
             context.fillStyle = "#fff";
 
-            answer.forEach(function(faces) {
-
-                //get the face rectangle to draw
-                var faceRect= faces.faceRectangle;             
-                context.strokeRect(faceRect.left,faceRect.top,faceRect.height,faceRect.width);
+            answer.forEach(function(faces) {             
+                drawFaces(canvas, context, faces);
 
                 //get the emotions of all the persons present and put them in an array
                 var totalEmotion= sumObjectsByKey(faces.scores);
 
                 var dominant = findDominantEmotion(totalEmotion);
+              
+
             }, this);
 
            
